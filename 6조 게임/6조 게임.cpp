@@ -57,9 +57,20 @@ void initializePlayer(Player& player, const string& playerName, int initialHP, i
 
 // 변경된 스텟을 표시하는 함수
 void showStats(const Player& player) {
-    cout << "\n===== 변경된 스텟 =====" << endl;
-    cout << "현재 체력: " << player.HP << endl;
-    cout << "현재 공격력: " << player.attack << endl;
+    cout << "\n===== 스테이터스 =====" << endl;
+    cout << "플레이어: " << player.name << endl;
+    cout << "HP: " << player.HP << endl;
+    cout << "MP: " << player.MP << endl;
+    cout << "공격력: " << player.attack << endl;
+    cout << "훈련 포인트: " << player.trainingPoints << " 포인트" << endl; // 훈련 포인트 출력
+}
+
+// 스텟 변경 함수
+void changeStats(Player& player, int hpChange, int attackChange) {
+    player.HP += hpChange;
+    player.attack += attackChange;
+    // 변경된 스텟을 표시
+    showStats(player);
 }
 
 int main() {
@@ -95,93 +106,74 @@ int main() {
         initializePlayer(player, playerName, initialHP, initialMP, initialAttack, initialTrainingPoints);
     }
 
-    cout << "\n환영합니다, " << player.name << "님!" << endl;
-    cout << "HP: " << player.HP << endl;
-    cout << "MP: " << player.MP << endl;
-    cout << "공격력: " << player.attack << endl;
-    cout << "훈련 포인트: " << player.trainingPoints << " 포인트" << endl; // 훈련 포인트 출력
-
     // 게임 진행 루프
     bool playing = true;
     bool inTraining = false; // 훈련소에 입장한 상태인지 여부
     while (playing) {
-        // 게임 로직을 이곳에 작성하세요.
-
-        if (!inTraining) {
-            // 기본 메뉴 표시
+        if (inTraining) {
+            showStats(player);
+            cout << "\n===== 훈련소 메뉴 =====" << endl;
+            cout << "1. 체력 증가 (+5)" << endl;
+            cout << "2. 공격력 증가 (+1)" << endl;
+            cout << "3. 훈련소 나가기" << endl;
+            cout << "메뉴를 선택하세요: ";
+            int choice;
+            cin >> choice;
+            switch (choice) {
+            case 1:
+                if (player.trainingPoints >= 1) {
+                    changeStats(player, 5, 0); // 체력 증가
+                    player.trainingPoints -= 1; // 훈련 포인트 감소
+                }
+                else {
+                    cout << "훈련 포인트가 부족합니다." << endl;
+                }
+                break;
+            case 2:
+                if (player.trainingPoints >= 1) {
+                    changeStats(player, 0, 1); // 공격력 증가
+                    player.trainingPoints -= 1; // 훈련 포인트 감소
+                }
+                else {
+                    cout << "훈련 포인트가 부족합니다." << endl;
+                }
+                break;
+            case 3:
+                inTraining = false; // 훈련소 나가기
+                break;
+            default:
+                cout << "올바른 메뉴 번호를 선택하세요." << endl;
+                break;
+            }
+        }
+        else {
+            showStats(player);
             cout << "\n===== 기본 메뉴 =====" << endl;
             cout << "1. 게임 저장하기" << endl;
             cout << "2. 게임 로드하기" << endl;
             cout << "3. 게임 종료하기" << endl;
             cout << "4. 훈련소" << endl;
             cout << "메뉴를 선택하세요: ";
+            int choice;
+            cin >> choice;
+            switch (choice) {
+            case 1:
+                saveGame(player); // 게임 저장
+                break;
+            case 2:
+                loadGame(player); // 게임 로드
+                break;
+            case 3:
+                playing = false; // 게임 종료
+                break;
+            case 4:
+                inTraining = true; // 훈련소 입장
+                break;
+            default:
+                cout << "올바른 메뉴 번호를 선택하세요." << endl;
+                break;
+            }
         }
-        else {
-            // 훈련소 메뉴 표시
-            cout << "\n===== 훈련소 메뉴 =====" << endl;
-            cout << "1. 체력 증가 (+5)" << endl;
-            cout << "2. 공격력 증가 (+1)" << endl;
-            cout << "3. 훈련소 나가기" << endl;
-            cout << "메뉴를 선택하세요: ";
-        }
-
-        char choice;
-        cin >> choice;
-
-        switch (choice) {
-        case '1':
-            if (inTraining) {
-                if (player.trainingPoints >= 1) {
-                    player.HP += 5;
-                    player.trainingPoints -= 1;
-                    cout << "체력이 5 증가했습니다. 현재 체력: " << player.HP << endl;
-                    showStats(player); // 변경된 스텟 표시
-                }
-                else {
-                    cout << "훈련 포인트가 부족합니다." << endl;
-                }
-            }
-            else {
-                saveGame(player);
-            }
-            break;
-        case '2':
-            if (inTraining) {
-                if (player.trainingPoints >= 1) {
-                    player.attack += 1;
-                    player.trainingPoints -= 1;
-                    cout << "공격력이 1 증가했습니다. 현재 공격력: " << player.attack << endl;
-                    showStats(player); // 변경된 스텟 표시
-                }
-                else {
-                    cout << "훈련 포인트가 부족합니다." << endl;
-                }
-            }
-            else {
-                loadGame(player);
-            }
-            break;
-        case '3':
-            if (inTraining) {
-                inTraining = false;
-                cout << "훈련소에서 나갑니다." << endl;
-            }
-            else {
-                playing = false;
-            }
-            break;
-        case '4':
-            if (!inTraining) {
-                cout << "훈련소에 입장합니다." << endl;
-                inTraining = true;
-            }
-            break;
-        default:
-            cout << "올바른 메뉴 번호를 선택하세요." << endl;
-            break;
-        }
-
-        cin.ignore(); // 버퍼 비우기
     }
 
     cout << "게임을 종료합니다. 다음에 또 만나요!" << endl;
