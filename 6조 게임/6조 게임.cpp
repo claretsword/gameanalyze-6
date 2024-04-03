@@ -64,16 +64,32 @@ int main() {
     while (playing) {
         // 게임 로직을 이곳에 작성하세요.
 
-        // 세이브 및 종료 옵션 출력
-        cout << "게임을 저장하려면 's'를 입력하세요. 종료하려면 'q'를 입력하세요: ";
-        string input;
-        getline(cin, input);
-        if (input == "s" || input == "save") {
+        // 메뉴 출력
+        cout << "\n===== 메뉴 =====" << endl;
+        cout << "1. 게임 저장하기" << endl;
+        cout << "2. 게임 로드하기" << endl;
+        cout << "3. 게임 종료하기" << endl;
+        cout << "메뉴를 선택하세요: ";
+
+        int choice;
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
             saveGame(playerName);
-        }
-        else if (input == "q" || input == "quit") {
+            break;
+        case 2:
+            loadGame(playerName);
+            break;
+        case 3:
             playing = false;
+            break;
+        default:
+            cout << "올바른 메뉴 번호를 선택하세요." << endl;
+            break;
         }
+
+        cin.ignore(); // 버퍼 비우기
     }
 
     cout << "게임을 종료합니다. 다음에 또 만나요!" << endl;
