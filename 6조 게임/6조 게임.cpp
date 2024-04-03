@@ -9,7 +9,7 @@ struct Player {
     int HP;
     int MP;
     int attack;
-    int gold;
+    int trainingPoints;
 };
 
 // 세이브 함수
@@ -20,7 +20,7 @@ void saveGame(const Player& player) {
         saveFile << player.HP << endl;
         saveFile << player.MP << endl;
         saveFile << player.attack << endl;
-        saveFile << player.gold << endl;
+        saveFile << player.trainingPoints << endl;
         saveFile.close();
         cout << "게임이 성공적으로 저장되었습니다." << endl;
     }
@@ -37,7 +37,7 @@ void loadGame(Player& player) {
         loadFile >> player.HP;
         loadFile >> player.MP;
         loadFile >> player.attack;
-        loadFile >> player.gold;
+        loadFile >> player.trainingPoints;
         loadFile.close();
         cout << "게임이 성공적으로 로드되었습니다." << endl;
     }
@@ -46,13 +46,13 @@ void loadGame(Player& player) {
     }
 }
 
-// 플레이어의 스탯과 골드를 초기화하는 함수
-void initializePlayer(Player& player, const string& playerName, int initialHP, int initialMP, int initialAttack, int initialGold) {
+// 플레이어의 스탯과 훈련 포인트를 초기화하는 함수
+void initializePlayer(Player& player, const string& playerName, int initialHP, int initialMP, int initialAttack, int initialTrainingPoints) {
     player.name = playerName;
     player.HP = initialHP;
     player.MP = initialMP;
     player.attack = initialAttack;
-    player.gold = initialGold;
+    player.trainingPoints = initialTrainingPoints;
 }
 
 int main() {
@@ -61,7 +61,7 @@ int main() {
     int initialHP = 100;
     int initialMP = 80;
     int initialAttack = 5;
-    int initialGold = 500; // 초기 골드 재화
+    int initialTrainingPoints = 3; // 초기 훈련 포인트
 
     // 세이브 파일이 존재하는지 확인하여 로드 또는 새로운 게임 시작
     ifstream saveFile("save_game.txt");
@@ -78,60 +78,115 @@ int main() {
             cout << "플레이어의 이름을 입력하세요: ";
             cin.ignore(); // 이전에 남아있는 '\n' 문자를 지움
             getline(cin, playerName);
-            initializePlayer(player, playerName, initialHP, initialMP, initialAttack, initialGold);
+            initializePlayer(player, playerName, initialHP, initialMP, initialAttack, initialTrainingPoints);
         }
     }
     else {
         // 새로운 게임 시작
         cout << "플레이어의 이름을 입력하세요: ";
         getline(cin, playerName);
-        initializePlayer(player, playerName, initialHP, initialMP, initialAttack, initialGold);
+        initializePlayer(player, playerName, initialHP, initialMP, initialAttack, initialTrainingPoints);
     }
 
     cout << "\n환영합니다, " << player.name << "님!" << endl;
     cout << "HP: " << player.HP << endl;
     cout << "MP: " << player.MP << endl;
     cout << "공격력: " << player.attack << endl;
-    cout << "골드: " << player.gold << "골드" << endl; // 골드 재화 출력
+    cout << "훈련 포인트: " << player.trainingPoints << " 포인트" << endl; // 훈련 포인트 출력
 
     // 게임 진행 루프
     bool playing = true;
+    bool showMenu = false; // 메뉴 표시 여부
+    bool inTraining = false; // 훈련소에 입장한 상태인지 여부
     while (playing) {
         // 게임 로직을 이곳에 작성하세요.
 
-        // 메뉴 출력
-        cout << "\n===== 메뉴 =====" << endl;
-        cout << "1. 게임 저장하기" << endl;
-        cout << "2. 게임 로드하기" << endl;
-        cout << "3. 게임 종료하기" << endl;
-        cout << "4. 상점" << endl;
-        cout << "5. 본 게임 시작" << endl;
-        cout << "메뉴를 선택하세요: ";
+        if (showMenu) {
+            // 메뉴 표시
+            cout << "\n===== 메뉴 =====" << endl;
+            cout << "1. 게임 저장하기" << endl;
+            cout << "2. 게임 로드하기" << endl;
+            cout << "3. 게임 종료하기" << endl;
+            if (!inTraining) {
+                cout << "4. 훈련소" << endl;
+            }
+            else {
+                cout << "4. 훈련소 나가기" << endl;
+            }
+            cout << "5. 본 게임 시작" << endl;
+            cout << "메뉴를 선택하세요: ";
+            showMenu = false; // 메뉴를 표시한 후 다시 숨김
+        }
+        else {
+            cout << "\nM. 메뉴 표시" << endl;
+        }
 
-        int choice;
+        char choice;
         cin >> choice;
 
         switch (choice) {
-        case 1:
+        case 'M':
+        case 'm':
+            showMenu = !showMenu; // M 버튼을 누를 때마다 메뉴 표시 여부 변경
+            break;
+        case '1':
             saveGame(player);
             break;
-        case 2:
+        case '2':
             loadGame(player);
             break;
-        case 3:
+        case '3':
             playing = false;
             break;
-        case 4:
-            cout << "상점에 입장합니다." << endl;
-            // 상점 코드 작성
+        case '4':
+            if (!inTraining) {
+                cout << "훈련소에 입장합니다." << endl;
+                inTraining = true;
+            }
+            else {
+                cout << "훈련소에서 나갑니다." << endl;
+                inTraining = false;
+            }
             break;
-        case 5:
+        case '5':
             cout << "본 게임을 시작합니다." << endl;
             // 본 게임 시작 코드 작성
             break;
         default:
             cout << "올바른 메뉴 번호를 선택하세요." << endl;
             break;
+        }
+
+        if (inTraining) {
+            // 훈련소에서 스탯을 증가시키는 로직
+            cout << "1. 체력 증가 (+5)" << endl;
+            cout << "2. 공격력 증가 (+1)" << endl;
+            cout << "훈련할 스탯을 선택하세요: ";
+            int trainingChoice;
+            cin >> trainingChoice;
+            if (trainingChoice == 1) {
+                if (player.trainingPoints >= 1) {
+                    player.HP += 5;
+                    player.trainingPoints -= 1;
+                    cout << "체력이 5 증가했습니다. 현재 체력: " << player.HP << endl;
+                }
+                else {
+                    cout << "훈련 포인트가 부족합니다." << endl;
+                }
+            }
+            else if (trainingChoice == 2) {
+                if (player.trainingPoints >= 1) {
+                    player.attack += 1;
+                    player.trainingPoints -= 1;
+                    cout << "공격력이 1 증가했습니다. 현재 공격력: " << player.attack << endl;
+                }
+                else {
+                    cout << "훈련 포인트가 부족합니다." << endl;
+                }
+            }
+            else {
+                cout << "올바른 번호를 선택하세요." << endl;
+            }
         }
 
         cin.ignore(); // 버퍼 비우기
