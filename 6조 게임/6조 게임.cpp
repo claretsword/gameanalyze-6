@@ -176,7 +176,7 @@ int main() {
         }
     }
 
-    cout << "게임을 종료합니다. 다음에 또 만나요!" << endl;
+    cout << "게임을 종료합니다." << endl;
 
     return 0;
 }
