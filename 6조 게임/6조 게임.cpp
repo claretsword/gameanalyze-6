@@ -9,6 +9,7 @@ struct Player {
     int HP;
     int MP;
     int attack;
+    int gold;
 };
 
 // 세이브 함수
@@ -19,6 +20,7 @@ void saveGame(const Player& player) {
         saveFile << player.HP << endl;
         saveFile << player.MP << endl;
         saveFile << player.attack << endl;
+        saveFile << player.gold << endl;
         saveFile.close();
         cout << "게임이 성공적으로 저장되었습니다." << endl;
     }
@@ -35,6 +37,7 @@ void loadGame(Player& player) {
         loadFile >> player.HP;
         loadFile >> player.MP;
         loadFile >> player.attack;
+        loadFile >> player.gold;
         loadFile.close();
         cout << "게임이 성공적으로 로드되었습니다." << endl;
     }
@@ -43,12 +46,13 @@ void loadGame(Player& player) {
     }
 }
 
-// 플레이어의 스탯을 초기화하는 함수
-void initializePlayer(Player& player, const string& playerName, int initialHP, int initialMP, int initialAttack) {
+// 플레이어의 스탯과 골드를 초기화하는 함수
+void initializePlayer(Player& player, const string& playerName, int initialHP, int initialMP, int initialAttack, int initialGold) {
     player.name = playerName;
     player.HP = initialHP;
     player.MP = initialMP;
     player.attack = initialAttack;
+    player.gold = initialGold;
 }
 
 int main() {
@@ -57,6 +61,7 @@ int main() {
     int initialHP = 100;
     int initialMP = 80;
     int initialAttack = 5;
+    int initialGold = 500; // 초기 골드 재화
 
     // 세이브 파일이 존재하는지 확인하여 로드 또는 새로운 게임 시작
     ifstream saveFile("save_game.txt");
@@ -73,20 +78,21 @@ int main() {
             cout << "플레이어의 이름을 입력하세요: ";
             cin.ignore(); // 이전에 남아있는 '\n' 문자를 지움
             getline(cin, playerName);
-            initializePlayer(player, playerName, initialHP, initialMP, initialAttack);
+            initializePlayer(player, playerName, initialHP, initialMP, initialAttack, initialGold);
         }
     }
     else {
         // 새로운 게임 시작
         cout << "플레이어의 이름을 입력하세요: ";
         getline(cin, playerName);
-        initializePlayer(player, playerName, initialHP, initialMP, initialAttack);
+        initializePlayer(player, playerName, initialHP, initialMP, initialAttack, initialGold);
     }
 
     cout << "\n환영합니다, " << player.name << "님!" << endl;
     cout << "HP: " << player.HP << endl;
     cout << "MP: " << player.MP << endl;
     cout << "공격력: " << player.attack << endl;
+    cout << "골드: " << player.gold << "골드" << endl; // 골드 재화 출력
 
     // 게임 진행 루프
     bool playing = true;
@@ -95,12 +101,12 @@ int main() {
 
         // 메뉴 출력
         cout << "\n===== 메뉴 =====" << endl;
-        cout << "m. 메뉴 보기" << endl;
+        cout << "M. 메뉴 보기" << endl;
 
-        // 'm' 버튼을 누르면 메뉴가 나오도록 설정
+        // 'M' 버튼을 누르면 메뉴가 나오도록 설정
         char menuButton;
         cin >> menuButton;
-        if (menuButton == 'M') {
+        if (menuButton == 'M' || menuButton == 'm') {
             cout << "1. 게임 저장하기" << endl;
             cout << "2. 게임 로드하기" << endl;
             cout << "3. 게임 종료하기" << endl;
