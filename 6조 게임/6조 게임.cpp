@@ -101,40 +101,40 @@ int main() {
 
         // 메뉴 출력
         cout << "\n===== 메뉴 =====" << endl;
-        cout << "M. 메뉴 보기" << endl;
+        cout << "1. 게임 저장하기" << endl;
+        cout << "2. 게임 로드하기" << endl;
+        cout << "3. 게임 종료하기" << endl;
+        cout << "4. 상점" << endl;
+        cout << "5. 본 게임 시작" << endl;
+        cout << "메뉴를 선택하세요: ";
 
-        // 'M' 버튼을 누르면 메뉴가 나오도록 설정
-        char menuButton;
-        cin >> menuButton;
-        if (menuButton == 'M' || menuButton == 'm') {
-            cout << "1. 게임 저장하기" << endl;
-            cout << "2. 게임 로드하기" << endl;
-            cout << "3. 게임 종료하기" << endl;
-            cout << "메뉴를 선택하세요: ";
+        int choice;
+        cin >> choice;
 
-            int choice;
-            cin >> choice;
-
-            switch (choice) {
-            case 1:
-                saveGame(player);
-                break;
-            case 2:
-                loadGame(player);
-                break;
-            case 3:
-                playing = false;
-                break;
-            default:
-                cout << "올바른 메뉴 번호를 선택하세요." << endl;
-                break;
-            }
-
-            cin.ignore(); // 버퍼 비우기
+        switch (choice) {
+        case 1:
+            saveGame(player);
+            break;
+        case 2:
+            loadGame(player);
+            break;
+        case 3:
+            playing = false;
+            break;
+        case 4:
+            cout << "상점에 입장합니다." << endl;
+            // 상점 코드 작성
+            break;
+        case 5:
+            cout << "본 게임을 시작합니다." << endl;
+            // 본 게임 시작 코드 작성
+            break;
+        default:
+            cout << "올바른 메뉴 번호를 선택하세요." << endl;
+            break;
         }
-        else {
-            // 게임 로직을 이곳에 작성하세요.
-        }
+
+        cin.ignore(); // 버퍼 비우기
     }
 
     cout << "게임을 종료합니다. 다음에 또 만나요!" << endl;
