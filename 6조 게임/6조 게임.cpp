@@ -187,12 +187,15 @@ int main() {
                     }
                     else {
                         std::cout << "가게를 키우는데 실패했습니다." << std::endl;
+                        // 실패 시 단계를 1로 초기화
+                        idData[id].first = 1;
                     }
                 }
                 else {
                     std::cout << "최대 업그레이드 단계에 도달했습니다." << std::endl;
                 }
                 break;
+
             case '2':
                 // 가게를 판매한다
                 std::cout << "가게를 판매하는 기능을 구현해주세요." << std::endl;
