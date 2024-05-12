@@ -184,21 +184,25 @@ int main() {
                         ++idData[id].first;
                         idData[id].second -= upgradeCosts[idData[id].first]; // 강화 비용 차감
                         std::cout << "가게를 키웠습니다! " << idData[id].first - 1 << "단계에서 " << idData[id].first << "단계로 업그레이드되었습니다." << std::endl;
+                        SaveGame(idData);
                     }
                     else {
                         std::cout << "가게를 키우는데 실패했습니다." << std::endl;
                         // 실패 시 단계를 1로 초기화
                         idData[id].first = 1;
+                        SaveGame(idData);
                     }
                 }
                 else {
                     std::cout << "최대 업그레이드 단계에 도달했습니다." << std::endl;
+                    SaveGame(idData);
                 }
                 break;
 
             case '2':
                 // 가게를 판매한다
                 std::cout << "가게를 판매하는 기능을 구현해주세요." << std::endl;
+                SaveGame(idData);
                 break;
             case '3':
                 // 저장하기
@@ -206,6 +210,7 @@ int main() {
                 break;
             case '4':
                 // 종료
+                SaveGame(idData);
                 std::cout << "게임을 종료합니다." << std::endl;
                 return 0;
             default:
