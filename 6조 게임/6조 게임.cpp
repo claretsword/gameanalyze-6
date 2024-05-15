@@ -219,12 +219,12 @@ int main() {
                     if (rand() % 100 < successRates[idData[id].first]) { // 성공 여부 판정
                         ++idData[id].first;
                         idData[id].second -= upgradeCosts[idData[id].first]; // 강화 비용 차감
-                        std::cout << "가게를 키웠습니다! " << idData[id].first - 1 << "단계에서 " << idData[id].first << "단계로 업그레이드되었습니다." << std::endl;
+                        std::cout << "거봐유, 제가 잘 될거라 그랬쥬." << idData[id].first - 1 << "단계에서 " << idData[id].first << "단계로 업그레이드되었습니다." << std::endl;
                         SaveGame(idData);
                         SaveGameToCSV(idData, id);
                     }
                     else {
-                        std::cout << "가게를 키우는데 실패했습니다." << std::endl;
+                        std::cout << "제 말 안들으니 이렇게 됐잖아유. 거기는 좀 따뜻해유?" << std::endl;
                         // 실패 시 단계를 1로 초기화
                         idData[id].first = 1;
                         SaveGame(idData);
