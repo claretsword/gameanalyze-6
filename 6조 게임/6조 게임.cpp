@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <ctime>
 
+// salePrice를 전역 변수로 정의하여 해당 스코프에서 사용할 수 있도록 함
+int salePrice;
 void ShowTitleScreen() {
     const int width = 30; // 네모의 너비
     const int height = 7; // 네모의 높이
@@ -135,6 +137,13 @@ int main() {
         {18, 1800}, {19, 1900}, {20, 2000}, {21, 2100}, {22, 2200}, {23, 2300}, {24, 2400}, {25, 2500}
     };
 
+    // 각 단계별 판매 금액 설정
+    std::map<int, int> salePrices = {
+        {1, 10000}, {2, 15000}, {3, 20000}, {4, 25000}, {5, 30000}, {6, 35000}, {7, 40000}, {8, 45000}, {9, 50000},
+        {10, 55000}, {11, 60000}, {12, 65000}, {13, 70000}, {14, 75000}, {15, 80000}, {16, 85000}, {17, 90000},
+        {18, 95000}, {19, 100000}, {20, 105000}, {21, 110000}, {22, 115000}, {23, 120000}, {24, 125000}, {25, 130000}
+    };
+
     while (true) {
         ShowTitleScreen(); // 시작 화면 표시
 
@@ -201,18 +210,24 @@ int main() {
 
             case '2':
                 // 가게를 판매한다
-                std::cout << "가게를 판매하는 기능을 구현해주세요." << std::endl;
+                salePrice = salePrices[idData[id].first]; // 현재 단계에 해당하는 판매 금액
+                idData[id].second += salePrice; // 판매로 얻은 금액 추가
+                idData[id].first = 1; // 레벨을 1로 초기화
+                std::cout << "가게를 판매했습니다. 소지금에 " << salePrice << "원이 추가되었습니다." << std::endl;
                 SaveGame(idData);
                 break;
+
             case '3':
                 // 저장하기
                 SaveGame(idData);
                 break;
+
             case '4':
                 // 종료
                 SaveGame(idData);
                 std::cout << "게임을 종료합니다." << std::endl;
                 return 0;
+
             default:
                 std::cout << "잘못된 선택입니다." << std::endl;
             }
