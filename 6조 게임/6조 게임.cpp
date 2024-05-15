@@ -115,7 +115,7 @@ void SaveGameToCSV(const std::map<std::string, std::pair<int, int>>& idData, con
     }
 }
 
-bool LoadGame(std::map<std::string, std::pair<int, int>>& idData, std::string& id) {
+bool LoadGame(std::map<std::string, std::pair<int, int>>& idData, const std::string& id) {
     std::ifstream file("save_game.txt");
     if (file.is_open()) {
         std::string savedId;
@@ -129,13 +129,15 @@ bool LoadGame(std::map<std::string, std::pair<int, int>>& idData, std::string& i
         }
         file.close();
         if (!found) {
-            std::cout << "저장된 아이디가 없습니다." << std::endl;
+            std::cout << "저장된 아이디가 없습니다. 새 게임을 시작합니다." << std::endl;
+            idData[id] = std::make_pair(1, 10000000); // 새 게임 초기화
         }
-        return found;
+        return true;
     }
     else {
-        std::cout << "저장된 게임 데이터가 없습니다." << std::endl;
-        return false;
+        std::cout << "저장된 게임 데이터가 없습니다. 새 게임을 시작합니다." << std::endl;
+        idData[id] = std::make_pair(1, 10000000); // 새 게임 초기화
+        return true;
     }
 }
 
@@ -177,13 +179,14 @@ int main() {
         if (menuChoice == 1) {
             std::cout << "아이디를 입력하십시오: ";
             std::cin >> id; // 사용자 아이디 입력
+            idData[id] = std::make_pair(1, 10000000); // 새 게임 초기화
         }
         else if (menuChoice == 2) {
             std::cout << "불러올 아이디를 입력하십시오: ";
             std::cin >> id; // 불러올 아이디 입력
-            while (!LoadGame(idData, id)) {
-                std::cout << "불러올 아이디를 입력하십시오: ";
-                std::cin >> id; // 불러올 아이디 입력
+            if (!LoadGame(idData, id)) {
+                std::cout << "불러오기 실패. 새 게임을 시작합니다." << std::endl;
+                idData[id] = std::make_pair(1, 10000000); // 새 게임 초기화
             }
         }
         else if (menuChoice == 3) {
@@ -193,11 +196,6 @@ int main() {
         else {
             std::cout << "잘못된 선택입니다." << std::endl;
             continue;
-        }
-
-        // 새 게임일 경우 소지금과 레벨 초기화
-        if (menuChoice == 1) {
-            idData[id] = std::make_pair(1, 10000000);
         }
 
         // 게임 화면 표시
