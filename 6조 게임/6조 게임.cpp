@@ -7,6 +7,7 @@
 
 // salePrice를 전역 변수로 정의하여 해당 스코프에서 사용할 수 있도록 함
 int salePrice;
+
 void ShowTitleScreen() {
     const int width = 30; // 네모의 너비
     const int height = 7; // 네모의 높이
@@ -91,7 +92,30 @@ void SaveGame(const std::map<std::string, std::pair<int, int>>& idData) {
     }
 }
 
-bool LoadGame(std::map<std::string, std::pair<int, int>>& idData, std::string& id) {
+void SaveGameToCSV(const std::map<std::string, std::pair<int, int>>& idData, const std::string& id) {
+    std::ifstream checkFile("game_data.csv");
+    bool fileExists = checkFile.good();
+    checkFile.close();
+
+    std::ofstream csvFile("game_data.csv", std::ios::app);
+    if (csvFile.is_open()) {
+        if (!fileExists) {
+            // CSV 파일이 처음 생성될 때만 헤더 작성
+            csvFile << "ID,Level,Money" << std::endl;
+        }
+        // CSV 파일에 데이터 추가
+        const auto& entry = idData.at(id);
+        csvFile << id << "," << entry.first << "," << entry.second << std::endl;
+
+        std::cout << "게임 데이터가 CSV 파일에 저장되었습니다." << std::endl;
+        csvFile.close();
+    }
+    else {
+        std::cout << "CSV 파일 저장 실패: 파일을 열 수 없습니다." << std::endl;
+    }
+}
+
+bool LoadGame(std::map<std::string, std::pair<int, int>>& idData, const std::string& id) {
     std::ifstream file("save_game.txt");
     if (file.is_open()) {
         std::string savedId;
@@ -105,13 +129,15 @@ bool LoadGame(std::map<std::string, std::pair<int, int>>& idData, std::string& i
         }
         file.close();
         if (!found) {
-            std::cout << "저장된 아이디가 없습니다." << std::endl;
+            std::cout << "저장된 아이디가 없습니다. 새 게임을 시작합니다." << std::endl;
+            idData[id] = std::make_pair(1, 10000000); // 새 게임 초기화
         }
-        return found;
+        return true;
     }
     else {
-        std::cout << "저장된 게임 데이터가 없습니다." << std::endl;
-        return false;
+        std::cout << "저장된 게임 데이터가 없습니다. 새 게임을 시작합니다." << std::endl;
+        idData[id] = std::make_pair(1, 10000000); // 새 게임 초기화
+        return true;
     }
 }
 
@@ -137,11 +163,11 @@ int main() {
         {18, 1800}, {19, 1900}, {20, 2000}, {21, 2100}, {22, 2200}, {23, 2300}, {24, 2400}, {25, 2500}
     };
 
-    // 각 단계별 판매 금액 설정
+    // 판매 가격 설정
     std::map<int, int> salePrices = {
-        {1, 10000}, {2, 15000}, {3, 20000}, {4, 25000}, {5, 30000}, {6, 35000}, {7, 40000}, {8, 45000}, {9, 50000},
-        {10, 55000}, {11, 60000}, {12, 65000}, {13, 70000}, {14, 75000}, {15, 80000}, {16, 85000}, {17, 90000},
-        {18, 95000}, {19, 100000}, {20, 105000}, {21, 110000}, {22, 115000}, {23, 120000}, {24, 125000}, {25, 130000}
+        {1, 5000}, {2, 10000}, {3, 15000}, {4, 20000}, {5, 25000}, {6, 30000}, {7, 35000}, {8, 40000}, {9, 45000},
+        {10, 50000}, {11, 55000}, {12, 60000}, {13, 65000}, {14, 70000}, {15, 75000}, {16, 80000}, {17, 85000},
+        {18, 90000}, {19, 95000}, {20, 100000}, {21, 105000}, {22, 110000}, {23, 115000}, {24, 120000}, {25, 125000}
     };
 
     while (true) {
@@ -153,13 +179,14 @@ int main() {
         if (menuChoice == 1) {
             std::cout << "아이디를 입력하십시오: ";
             std::cin >> id; // 사용자 아이디 입력
+            idData[id] = std::make_pair(1, 10000000); // 새 게임 초기화
         }
         else if (menuChoice == 2) {
             std::cout << "불러올 아이디를 입력하십시오: ";
             std::cin >> id; // 불러올 아이디 입력
-            while (!LoadGame(idData, id)) {
-                std::cout << "불러올 아이디를 입력하십시오: ";
-                std::cin >> id; // 불러올 아이디 입력
+            if (!LoadGame(idData, id)) {
+                std::cout << "불러오기 실패. 새 게임을 시작합니다." << std::endl;
+                idData[id] = std::make_pair(1, 10000000); // 새 게임 초기화
             }
         }
         else if (menuChoice == 3) {
@@ -169,11 +196,6 @@ int main() {
         else {
             std::cout << "잘못된 선택입니다." << std::endl;
             continue;
-        }
-
-        // 새 게임일 경우 소지금과 레벨 초기화
-        if (menuChoice == 1) {
-            idData[id] = std::make_pair(1, 10000000);
         }
 
         // 게임 화면 표시
@@ -194,17 +216,20 @@ int main() {
                         idData[id].second -= upgradeCosts[idData[id].first]; // 강화 비용 차감
                         std::cout << "가게를 키웠습니다! " << idData[id].first - 1 << "단계에서 " << idData[id].first << "단계로 업그레이드되었습니다." << std::endl;
                         SaveGame(idData);
+                        SaveGameToCSV(idData, id);
                     }
                     else {
                         std::cout << "가게를 키우는데 실패했습니다." << std::endl;
                         // 실패 시 단계를 1로 초기화
                         idData[id].first = 1;
                         SaveGame(idData);
+                        SaveGameToCSV(idData, id);
                     }
                 }
                 else {
                     std::cout << "최대 업그레이드 단계에 도달했습니다." << std::endl;
                     SaveGame(idData);
+                    SaveGameToCSV(idData, id);
                 }
                 break;
 
@@ -215,16 +240,19 @@ int main() {
                 idData[id].first = 1; // 레벨을 1로 초기화
                 std::cout << "가게를 판매했습니다. 소지금에 " << salePrice << "원이 추가되었습니다." << std::endl;
                 SaveGame(idData);
+                SaveGameToCSV(idData, id);
                 break;
 
             case '3':
                 // 저장하기
                 SaveGame(idData);
+                SaveGameToCSV(idData, id);
                 break;
 
             case '4':
                 // 종료
                 SaveGame(idData);
+                SaveGameToCSV(idData, id);
                 std::cout << "게임을 종료합니다." << std::endl;
                 return 0;
 
