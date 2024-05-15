@@ -97,12 +97,17 @@ void SaveGameToCSV(const std::map<std::string, std::pair<int, int>>& idData, con
     bool fileExists = checkFile.good();
     checkFile.close();
 
-    std::ofstream csvFile("game_data.csv", std::ios::app);
+    std::ofstream csvFile;
+    if (fileExists) {
+        csvFile.open("game_data.csv", std::ios::app);
+    }
+    else {
+        csvFile.open("game_data.csv");
+        // CSV 파일이 처음 생성될 때만 헤더 작성
+        csvFile << "ID,Level,Money" << std::endl;
+    }
+
     if (csvFile.is_open()) {
-        if (!fileExists) {
-            // CSV 파일이 처음 생성될 때만 헤더 작성
-            csvFile << "ID,Level,Money" << std::endl;
-        }
         // CSV 파일에 데이터 추가
         const auto& entry = idData.at(id);
         csvFile << id << "," << entry.first << "," << entry.second << std::endl;
