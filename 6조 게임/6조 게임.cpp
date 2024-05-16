@@ -1,9 +1,13 @@
-﻿#include <iostream>
+#define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
 #include <fstream>
 #include <string>
 #include <map>
 #include <cstdlib>
 #include <ctime>
+#include <chrono>
+#include <iomanip>
+
 
 // salePrice를 전역 변수로 정의하여 해당 스코프에서 사용할 수 있도록 함
 int salePrice;
@@ -37,8 +41,8 @@ void ShowTitleScreen() {
 }
 
 void ShowGameScreen(const std::string& id, int level, int money) {
-    std::map<int, std::string> levelToStage = { 
-       {1, "\033[36m그린벨트 옆 시골에 있는 라면 끓여주는 구멍가게\033[0m"},
+    std::map<int, std::string> levelToStage = {
+        {1, "\033[36m그린벨트 옆 시골에 있는 라면 끓여주는 구멍가게\033[0m"},
         {2, "\033[36m그린벨트를 벗어난 시골에 있는 라면가게\033[0m"},
         {3, "\033[36m시골 읍내로 입성한 라면가게\033[0m"},
         {4, "\033[36m읍내를 벗어나 작은 도시에 입성한 라면가게\033[0m"},
@@ -104,13 +108,18 @@ void SaveGameToCSV(const std::map<std::string, std::pair<int, int>>& idData, con
     else {
         csvFile.open("game_data.csv");
         // CSV 파일이 처음 생성될 때만 헤더 작성
-        csvFile << "ID,Level,Money" << std::endl;
+        csvFile << "ID,단계,소지금,날짜" << std::endl;
     }
 
     if (csvFile.is_open()) {
+        // 현재 시간 가져오기
+        auto now = std::chrono::system_clock::now();
+        auto currentTime = std::chrono::system_clock::to_time_t(now);
+
         // CSV 파일에 데이터 추가
         const auto& entry = idData.at(id);
-        csvFile << id << "," << entry.first << "," << entry.second << std::endl;
+        csvFile << id << "," << entry.first << "," << entry.second << ","
+            << std::put_time(std::localtime(&currentTime), "%Y-%m-%d %H:%M:%S") << std::endl;
 
         std::cout << "게임 데이터가 CSV 파일에 저장되었습니다." << std::endl;
         csvFile.close();
@@ -263,12 +272,6 @@ int main() {
 
             default:
                 std::cout << "잘못된 선택입니다." << std::endl;
-            }
-
-            // 게임 종료 조건 확인
-            if (idData[id].first >= 25 || idData[id].second <= 0) {
-                std::cout << "게임이 종료되었습니다." << std::endl;
-                break;
             }
         }
     }
