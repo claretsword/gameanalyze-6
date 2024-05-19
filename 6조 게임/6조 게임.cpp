@@ -8,78 +8,80 @@
 #include <chrono>
 #include <iomanip>
 
-
-// salePriceë¥¼ ì „ì—­ ë³€ìˆ˜ë¡œ ì •ì˜í•˜ì—¬ í•´ë‹¹ ìŠ¤ì½”í”„ì—ì„œ ì‚¬ìš©í•  ìˆ˜ ìžˆë„ë¡ í•¨
+// salePrice¸¦ Àü¿ª º¯¼ö·Î Á¤ÀÇÇÏ¿© ÇØ´ç ½ºÄÚÇÁ¿¡¼­ »ç¿ëÇÒ ¼ö ÀÖµµ·Ï ÇÔ
 int salePrice;
 
-void ShowTitleScreen() {
-    const int width = 30; // ë„¤ëª¨ì˜ ë„ˆë¹„
-    const int height = 7; // ë„¤ëª¨ì˜ ë†’ì´
+// °ÔÀÓ ½ÃÀÛ ½Ã°£À» ±â·ÏÇÏ´Â º¯¼ö
+std::chrono::system_clock::time_point gameStartTime;
 
-    // ìœ„ìª½ í…Œë‘ë¦¬
+void ShowTitleScreen() {
+    const int width = 30; // ³×¸ðÀÇ ³Êºñ
+    const int height = 7; // ³×¸ðÀÇ ³ôÀÌ
+
+    // À§ÂÊ Å×µÎ¸®
     std::cout << std::string(width, '=') << std::endl;
 
-    // ì¤‘ê°„ ë¶€ë¶„
+    // Áß°£ ºÎºÐ
     for (int i = 0; i < height - 4; ++i) {
         if (i == (height - 4) / 2) {
-            // í…ìŠ¤íŠ¸ ê°€ìš´ë° ì •ë ¬
-            std::cout << std::string((width - 20) / 2, ' ') << "Xì¢…ì›ì˜ ê³¨ëª©ì‹ë‹¹" << std::endl;
+            // ÅØ½ºÆ® °¡¿îµ¥ Á¤·Ä
+            std::cout << std::string((width - 20) / 2, ' ') << "XÁ¾¿øÀÇ °ñ¸ñ½Ä´ç" << std::endl;
         }
         else {
-            // ì¤‘ê°„ ì¤„ ì œì™¸í•˜ê³  ë¹ˆ ì¹¸ ì¶œë ¥
+            // Áß°£ ÁÙ Á¦¿ÜÇÏ°í ºó Ä­ Ãâ·Â
             std::cout << std::string(width, ' ') << std::endl;
         }
     }
 
-    // ë©”ë‰´ í•­ëª©
-    std::cout << "1. ìƒˆ ê²Œìž„" << std::endl;
-    std::cout << "2. ë¶ˆëŸ¬ì˜¤ê¸°" << std::endl;
-    std::cout << "3. ì¢…ë£Œ" << std::endl;
+    // ¸Þ´º Ç×¸ñ
+    std::cout << "1. »õ °ÔÀÓ" << std::endl;
+    std::cout << "2. ºÒ·¯¿À±â" << std::endl;
+    std::cout << "3. Á¾·á" << std::endl;
 
-    // ì•„ëž˜ìª½ í…Œë‘ë¦¬
+    // ¾Æ·¡ÂÊ Å×µÎ¸®
     std::cout << std::string(width, '=') << std::endl;
 }
 
 void ShowGameScreen(const std::string& id, int level, int money) {
     std::map<int, std::string> levelToStage = {
-        {1, "\033[36mê·¸ë¦°ë²¨íŠ¸ ì˜† ì‹œê³¨ì— ìžˆëŠ” ë¼ë©´ ë“ì—¬ì£¼ëŠ” êµ¬ë©ê°€ê²Œ\033[0m"},
-        {2, "\033[36mê·¸ë¦°ë²¨íŠ¸ë¥¼ ë²—ì–´ë‚œ ì‹œê³¨ì— ìžˆëŠ” ë¼ë©´ê°€ê²Œ\033[0m"},
-        {3, "\033[36mì‹œê³¨ ìë‚´ë¡œ ìž…ì„±í•œ ë¼ë©´ê°€ê²Œ\033[0m"},
-        {4, "\033[36mìë‚´ë¥¼ ë²—ì–´ë‚˜ ìž‘ì€ ë„ì‹œì— ìž…ì„±í•œ ë¼ë©´ê°€ê²Œ\033[0m"},
-        {5, "\033[36mì§€ë°©ì˜ í° ë²ˆí™”ê°€ì— ìž…ì„±í•œ ë¼ë©´ê°€ê²Œ\033[0m"},
-        {6, "\033[36mê²½ê¸°ë„ë¡œ ìž…ì„±í•œ ë¼ë©´ê°€ê²Œ\033[0m"},
-        {7, "\033[36mì„œìš¸ ë³€ë‘ë¦¬ ê²½ê¸°ë„ë¡œ ìž…ì„±í•œ ë¼ë©´ê°€ê²Œ\033[0m"},
-        {8, "\033[36mì„œìš¸ ë„íŠ¸ë¨¸ë¦¬ì— ìž…ì„±í•œ ë¼ë©´ê°€ê²Œ\033[0m"},
-        {9, "\033[36mí™ëŒ€ ì§„ì¶œì— ì„±ê³µí•œ ë¼ë©´ê°€ê²Œ\033[0m"},
-        {10, "\033[36m2í˜¸ì„ ì„ íƒ€ë©´ì„œ ê°•ë‚¨ìœ¼ë¡œ ê°€ëŠ” ë¼ë©´ê°€ê²Œ\033[0m"},
-        {11, "\033[36mê°•ë‚¨ ì§„ì¶œì— ì„±ê³µí•œ ë¼ë©´ê°€ê²Œ\033[0m"},
-        {12, "\033[36mì™¸êµ­ì¸ ê´€ê´‘ê°ë“¤ë„ ì°¾ì•„ì˜¤ëŠ” ë¼ë©´ê°€ê²Œ\033[0m"},
-        {13, "\033[36mì¼ë³¸ ì§„ì¶œì— ì„±ê³µí•œ ë¼ë©´ê°€ê²Œ\033[0m"},
-        {14, "\033[36mì¤‘êµ­ì„ ìž¬íŒ¨í•˜ê³  ë™ì•„ì‹œì•„ì˜ íŒ¨ê¶Œì„ ìž¡ì€ ë¼ë©´ê°€ê²Œ\033[0m"},
-        {15, "\033[36mì•„ì‹œì•„ ì „ì—­ì„ ì§€ë°°í•œ ë¼ë©´ê°€ê²Œ\033[0m"},
-        {16, "\033[36më™ìœ ëŸ½ì„ ì§‘ì–´ì‚¼í‚¨ ë¼ë©´ê°€ê²Œ\033[0m"},
-        {17, "\033[36mìœ ë¼ì‹œì•„ì˜ ì œì™•ì´ ëœ ë¼ë©´ê°€ê²Œ\033[0m"},
-        {18, "\033[36më¯¸êµ­ ë¹¼ê³  ë‹¤ ìž¡ì•„ë¨¹ì€ ë¼ë©´ê°€ê²Œ\033[0m"},
-        {19, "\033[36mì§€êµ¬ì •ë³µì— ì„±ê³µí•œ ë¼ë©´ê°€ê²Œ\033[0m"},
-        {20, "\033[36më‹¬ë‚˜ë¼ ì§„ì¶œì— ì„±ê³µí•œ ë¼ë©´ê°€ê²Œ\033[0m"},
-        {21, "\033[36mí™”ì„± 1í˜¸ì ì„ ê°œì—…í•œ ë¼ë©´ê°€ê²Œ\033[0m"},
-        {22, "\033[36mí•´ì™•ì„± í…Œë¼í¬ë°ì— ì„±ê³µí•œ ë¼ë©´ê°€ê²Œ\033[0m"},
-        {23, "\033[36míƒœì–‘ê³„ë¥¼ ì •ë³µí•œ ë¼ë©´ê°€ê²Œ\033[0m"},
-        {24, "\033[36mì€í•˜ê³„ë¥¼ ë„˜ë‚˜ë“œëŠ” ë¼ë©´ê°€ê²Œ\033[0m"},
-        {25, "\033[36mìš°ì£¼ë¥¼ ì§€ë°°í•˜ëŠ” ë¼ë©´ê°€ê²Œ\033[0m"}
+        {1, "\033[36m±×¸°º§Æ® ¿· ½Ã°ñ¿¡ ÀÖ´Â ¶ó¸é ²ú¿©ÁÖ´Â ±¸¸Û°¡°Ô\033[0m"},
+        {2, "\033[36m±×¸°º§Æ®¸¦ ¹þ¾î³­ ½Ã°ñ¿¡ ÀÖ´Â ¶ó¸é°¡°Ô\033[0m"},
+        {3, "\033[36m½Ã°ñ À¾³»·Î ÀÔ¼ºÇÑ ¶ó¸é°¡°Ô\033[0m"},
+        {4, "\033[36mÀ¾³»¸¦ ¹þ¾î³ª ÀÛÀº µµ½Ã¿¡ ÀÔ¼ºÇÑ ¶ó¸é°¡°Ô\033[0m"},
+        {5, "\033[36mÁö¹æÀÇ Å« ¹øÈ­°¡¿¡ ÀÔ¼ºÇÑ ¶ó¸é°¡°Ô\033[0m"},
+        {6, "\033[36m°æ±âµµ·Î ÀÔ¼ºÇÑ ¶ó¸é°¡°Ô\033[0m"},
+        {7, "\033[36m¼­¿ï º¯µÎ¸® °æ±âµµ·Î ÀÔ¼ºÇÑ ¶ó¸é°¡°Ô\033[0m"},
+        {8, "\033[36m¼­¿ï ²ôÆ®¸Ó¸®¿¡ ÀÔ¼ºÇÑ ¶ó¸é°¡°Ô\033[0m"},
+        {9, "\033[36mÈ«´ë ÁøÃâ¿¡ ¼º°øÇÑ ¶ó¸é°¡°Ô\033[0m"},
+        {10, "\033[36m2È£¼±À» Å¸¸é¼­ °­³²À¸·Î °¡´Â ¶ó¸é°¡°Ô\033[0m"},
+        {11, "\033[36m°­³² ÁøÃâ¿¡ ¼º°øÇÑ ¶ó¸é°¡°Ô\033[0m"},
+        {12, "\033[36m¿Ü±¹ÀÎ °ü±¤°´µéµµ Ã£¾Æ¿À´Â ¶ó¸é°¡°Ô\033[0m"},
+        {13, "\033[36mÀÏº» ÁøÃâ¿¡ ¼º°øÇÑ ¶ó¸é°¡°Ô\033[0m"},
+        {14, "\033[36mÁß±¹À» ÀçÆÐÇÏ°í µ¿¾Æ½Ã¾ÆÀÇ ÆÐ±ÇÀ» ÀâÀº ¶ó¸é°¡°Ô\033[0m"},
+        {15, "\033[36m¾Æ½Ã¾Æ Àü¿ªÀ» Áö¹èÇÑ ¶ó¸é°¡°Ô\033[0m"},
+        {16, "\033[36mµ¿À¯·´À» Áý¾î»ïÅ² ¶ó¸é°¡°Ô\033[0m"},
+        {17, "\033[36mÀ¯¶ó½Ã¾ÆÀÇ Á¦¿ÕÀÌ µÈ ¶ó¸é°¡°Ô\033[0m"},
+        {18, "\033[36m¹Ì±¹ »©°í ´Ù Àâ¾Æ¸ÔÀº ¶ó¸é°¡°Ô\033[0m"},
+        {19, "\033[36mÁö±¸Á¤º¹¿¡ ¼º°øÇÑ ¶ó¸é°¡°Ô\033[0m"},
+        {20, "\033[36m´Þ³ª¶ó ÁøÃâ¿¡ ¼º°øÇÑ ¶ó¸é°¡°Ô\033[0m"},
+        {21, "\033[36mÈ­¼º 1È£Á¡À» °³¾÷ÇÑ ¶ó¸é°¡°Ô\033[0m"},
+        {22, "\033[36mÇØ¿Õ¼º Å×¶óÆ÷¹Ö¿¡ ¼º°øÇÑ ¶ó¸é°¡°Ô\033[0m"},
+        {23, "\033[36mÅÂ¾ç°è¸¦ Á¤º¹ÇÑ ¶ó¸é°¡°Ô\033[0m"},
+        {24, "\033[36mÀºÇÏ°è¸¦ ³Ñ³ªµå´Â ¶ó¸é°¡°Ô\033[0m"},
+        {25, "\033[36m¿ìÁÖ¸¦ Áö¹èÇÏ´Â ¶ó¸é°¡°Ô\033[0m"}
     };
 
-    std::cout << "ì‚¬ìž¥: " << id << std::endl;
-    std::cout << "í˜„ìž¬ ë‹¨ê³„: " << level << "ë‹¨ê³„" << std::endl;
-    std::cout << "ê°€ê²Œ ìƒíƒœ: " << levelToStage[level] << std::endl;
-    std::cout << "ì†Œì§€ê¸ˆ: " << money << std::endl;
+    std::cout << "»çÀå: " << id << std::endl;
+    std::cout << "ÇöÀç ´Ü°è: " << level << "´Ü°è" << std::endl;
+    std::cout << "°¡°Ô »óÅÂ: " << levelToStage[level] << std::endl;
+    std::cout << "¼ÒÁö±Ý: " << money << std::endl;
 
-    // UI ë©”ë‰´ ì¶”ê°€
+    // UI ¸Þ´º Ãß°¡
     std::cout << "=== UI ===" << std::endl;
-    std::cout << "1. ê°€ê²Œë¥¼ í‚¤ìš´ë‹¤" << std::endl;
-    std::cout << "2. ê°€ê²Œë¥¼ íŒë§¤í•œë‹¤" << std::endl;
-    std::cout << "3. ì €ìž¥í•˜ê¸°" << std::endl;
-    std::cout << "4. ì¢…ë£Œ" << std::endl;
+    std::cout << "1. °¡°Ô¸¦ Å°¿î´Ù" << std::endl;
+    std::cout << "2. °¡°Ô¸¦ ÆÇ¸ÅÇÑ´Ù" << std::endl;
+    std::cout << "3. ÀúÀåÇÏ±â" << std::endl;
+    std::cout << "4. Á¾·á" << std::endl;
 }
 
 void SaveGame(const std::map<std::string, std::pair<int, int>>& idData) {
@@ -88,15 +90,15 @@ void SaveGame(const std::map<std::string, std::pair<int, int>>& idData) {
         for (const auto& entry : idData) {
             file << entry.first << " " << entry.second.first << " " << entry.second.second << std::endl;
         }
-        std::cout << "ê²Œìž„ì´ ì €ìž¥ë˜ì—ˆìŠµë‹ˆë‹¤." << std::endl;
+        std::cout << "°ÔÀÓÀÌ ÀúÀåµÇ¾ú½À´Ï´Ù." << std::endl;
         file.close();
     }
     else {
-        std::cout << "ê²Œìž„ ì €ìž¥ ì‹¤íŒ¨: íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤." << std::endl;
+        std::cout << "°ÔÀÓ ÀúÀå ½ÇÆÐ: ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù." << std::endl;
     }
 }
 
-void SaveGameToCSV(const std::map<std::string, std::pair<int, int>>& idData, const std::string& id) {
+void SaveGameToCSV(const std::map<std::string, std::pair<int, int>>& idData, const std::string& id, const std::chrono::system_clock::time_point& startTime) {
     std::ifstream checkFile("game_data.csv");
     bool fileExists = checkFile.good();
     checkFile.close();
@@ -107,25 +109,28 @@ void SaveGameToCSV(const std::map<std::string, std::pair<int, int>>& idData, con
     }
     else {
         csvFile.open("game_data.csv");
-        // CSV íŒŒì¼ì´ ì²˜ìŒ ìƒì„±ë  ë•Œë§Œ í—¤ë” ìž‘ì„±
-        csvFile << "ID,ë‹¨ê³„,ì†Œì§€ê¸ˆ,ë‚ ì§œ" << std::endl;
+        // CSV ÆÄÀÏÀÌ Ã³À½ »ý¼ºµÉ ¶§¸¸ Çì´õ ÀÛ¼º
+        csvFile << "ID,´Ü°è,¼ÒÁö±Ý,½ÃÀÛ ³¯Â¥,½ÃÀÛ ½Ã°£,Á¾·á ½Ã°£" << std::endl;
     }
 
     if (csvFile.is_open()) {
-        // í˜„ìž¬ ì‹œê°„ ê°€ì ¸ì˜¤ê¸°
+        // ÇöÀç ½Ã°£ °¡Á®¿À±â
         auto now = std::chrono::system_clock::now();
         auto currentTime = std::chrono::system_clock::to_time_t(now);
+        auto startDateTime = std::chrono::system_clock::to_time_t(startTime);
 
-        // CSV íŒŒì¼ì— ë°ì´í„° ì¶”ê°€
+        // CSV ÆÄÀÏ¿¡ µ¥ÀÌÅÍ Ãß°¡
         const auto& entry = idData.at(id);
         csvFile << id << "," << entry.first << "," << entry.second << ","
-            << std::put_time(std::localtime(&currentTime), "%Y-%m-%d %H:%M:%S") << std::endl;
+            << std::put_time(std::localtime(&startDateTime), "%Y-%m-%d") << ","
+            << std::put_time(std::localtime(&startDateTime), "%H:%M:%S") << ","
+            << std::put_time(std::localtime(&currentTime), "%H:%M:%S") << std::endl;
 
-        std::cout << "ê²Œìž„ ë°ì´í„°ê°€ CSV íŒŒì¼ì— ì €ìž¥ë˜ì—ˆìŠµë‹ˆë‹¤." << std::endl;
+        std::cout << "°ÔÀÓ µ¥ÀÌÅÍ°¡ CSV ÆÄÀÏ¿¡ ÀúÀåµÇ¾ú½À´Ï´Ù." << std::endl;
         csvFile.close();
     }
     else {
-        std::cout << "CSV íŒŒì¼ ì €ìž¥ ì‹¤íŒ¨: íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤." << std::endl;
+        std::cout << "CSV ÆÄÀÏ ÀúÀå ½ÇÆÐ: ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù." << std::endl;
     }
 }
 
@@ -143,41 +148,41 @@ bool LoadGame(std::map<std::string, std::pair<int, int>>& idData, const std::str
         }
         file.close();
         if (!found) {
-            std::cout << "ì €ìž¥ëœ ì•„ì´ë””ê°€ ì—†ìŠµë‹ˆë‹¤. ìƒˆ ê²Œìž„ì„ ì‹œìž‘í•©ë‹ˆë‹¤." << std::endl;
-            idData[id] = std::make_pair(1, 10000); // ìƒˆ ê²Œìž„ ì´ˆê¸°í™”
+            std::cout << "ÀúÀåµÈ ¾ÆÀÌµð°¡ ¾ø½À´Ï´Ù. »õ °ÔÀÓÀ» ½ÃÀÛÇÕ´Ï´Ù." << std::endl;
+            idData[id] = std::make_pair(1, 10000); // »õ °ÔÀÓ ÃÊ±âÈ­
         }
         return true;
     }
     else {
-        std::cout << "ì €ìž¥ëœ ê²Œìž„ ë°ì´í„°ê°€ ì—†ìŠµë‹ˆë‹¤. ìƒˆ ê²Œìž„ì„ ì‹œìž‘í•©ë‹ˆë‹¤." << std::endl;
-        idData[id] = std::make_pair(1, 10000); // ìƒˆ ê²Œìž„ ì´ˆê¸°í™”
+        std::cout << "ÀúÀåµÈ °ÔÀÓ µ¥ÀÌÅÍ°¡ ¾ø½À´Ï´Ù. »õ °ÔÀÓÀ» ½ÃÀÛÇÕ´Ï´Ù." << std::endl;
+        idData[id] = std::make_pair(1, 10000); // »õ °ÔÀÓ ÃÊ±âÈ­
         return true;
     }
 }
 
 int main() {
-    srand(time(0)); // ë‚œìˆ˜ ìƒì„±ê¸° ì´ˆê¸°í™”
+    srand(time(0)); // ³­¼ö »ý¼º±â ÃÊ±âÈ­
 
     std::map<std::string, std::pair<int, int>> idData;
     std::string id;
     int level = 1;
-    int money = 10000; // ì†Œì§€ê¸ˆì„ 10000ì›ìœ¼ë¡œ ì´ˆê¸°í™”
+    int money = 10000; // ¼ÒÁö±ÝÀ» 10000¿øÀ¸·Î ÃÊ±âÈ­
 
-    // ê° ë‹¨ê³„ë³„ ì„±ê³µ í™•ë¥  ì„¤ì •
+    // °¢ ´Ü°èº° ¼º°ø È®·ü ¼³Á¤
     std::map<int, int> successRates = {
         {1, 100}, {2, 99}, {3, 98}, {4, 97}, {5, 96}, {6, 95}, {7, 94}, {8, 92}, {9, 90},
         {10, 88}, {11, 86}, {12, 84}, {13, 82}, {14, 80}, {15, 77}, {16, 74}, {17, 71},
         {18, 65}, {19, 60}, {20, 55}, {21, 50}, {22, 40}, {23, 30}, {24, 20}, {25, 10}
     };
 
-    // ê° ë‹¨ê³„ë³„ ê°€ê²© ì„¤ì •
+    // °¢ ´Ü°èº° °¡°Ý ¼³Á¤
     std::map<int, int> upgradeCosts = {
         {1, 100}, {2, 200}, {3, 400}, {4, 600}, {5, 800}, {6, 1200}, {7, 1500}, {8, 2000}, {9, 2300},
         {10, 2500}, {11, 2800}, {12, 3000}, {13, 3300}, {14, 3800}, {15, 4000}, {16, 4500}, {17, 6000},
         {18, 7000}, {19, 9000}, {20, 10000}, {21, 30000}, {22, 40000}, {23, 50000}, {24, 100000}, {25, 200000}
     };
 
-    // íŒë§¤ ê°€ê²© ì„¤ì •
+    // ÆÇ¸Å °¡°Ý ¼³Á¤
     std::map<int, int> salePrices = {
         {1, 0}, {2, 100}, {3, 150}, {4, 300}, {5, 400}, {6, 600}, {7, 800}, {8, 1000}, {9, 2000},
         {10, 2200}, {11, 2500}, {12, 3000}, {13, 4000}, {14, 4500}, {15, 6000}, {16, 8000}, {17, 9000},
@@ -185,93 +190,95 @@ int main() {
     };
 
     while (true) {
-        ShowTitleScreen(); // ì‹œìž‘ í™”ë©´ í‘œì‹œ
+        ShowTitleScreen(); // ½ÃÀÛ È­¸é Ç¥½Ã
 
-        int menuChoice; // ì‹œìž‘ í™”ë©´ì—ì„œì˜ ì„ íƒì§€ ë³€ìˆ˜
-        std::cin >> menuChoice; // ì‚¬ìš©ìž ì„ íƒ ìž…ë ¥
+        int menuChoice; // ½ÃÀÛ È­¸é¿¡¼­ÀÇ ¼±ÅÃÁö º¯¼ö
+        std::cin >> menuChoice; // »ç¿ëÀÚ ¼±ÅÃ ÀÔ·Â
 
         if (menuChoice == 1) {
-            std::cout << "ì•„ì´ë””ë¥¼ ìž…ë ¥í•˜ì‹­ì‹œì˜¤: ";
-            std::cin >> id; // ì‚¬ìš©ìž ì•„ì´ë”” ìž…ë ¥
-            idData[id] = std::make_pair(1, 10000); // ìƒˆ ê²Œìž„ ì´ˆê¸°í™”
+            std::cout << "¾ÆÀÌµð¸¦ ÀÔ·ÂÇÏ½Ê½Ã¿À: ";
+            std::cin >> id; // »ç¿ëÀÚ ¾ÆÀÌµð ÀÔ·Â
+            idData[id] = std::make_pair(1, 10000); // »õ °ÔÀÓ ÃÊ±âÈ­
+            gameStartTime = std::chrono::system_clock::now(); // °ÔÀÓ ½ÃÀÛ ½Ã°£ ±â·Ï
         }
         else if (menuChoice == 2) {
-            std::cout << "ë¶ˆëŸ¬ì˜¬ ì•„ì´ë””ë¥¼ ìž…ë ¥í•˜ì‹­ì‹œì˜¤: ";
-            std::cin >> id; // ë¶ˆëŸ¬ì˜¬ ì•„ì´ë”” ìž…ë ¥
+            std::cout << "ºÒ·¯¿Ã ¾ÆÀÌµð¸¦ ÀÔ·ÂÇÏ½Ê½Ã¿À: ";
+            std::cin >> id; // ºÒ·¯¿Ã ¾ÆÀÌµð ÀÔ·Â
             if (!LoadGame(idData, id)) {
-                std::cout << "ë¶ˆëŸ¬ì˜¤ê¸° ì‹¤íŒ¨. ìƒˆ ê²Œìž„ì„ ì‹œìž‘í•©ë‹ˆë‹¤." << std::endl;
-                idData[id] = std::make_pair(1, 10000); // ìƒˆ ê²Œìž„ ì´ˆê¸°í™”
+                std::cout << "ºÒ·¯¿À±â ½ÇÆÐ. »õ °ÔÀÓÀ» ½ÃÀÛÇÕ´Ï´Ù." << std::endl;
+                idData[id] = std::make_pair(1, 10000); // »õ °ÔÀÓ ÃÊ±âÈ­
             }
+            gameStartTime = std::chrono::system_clock::now(); // °ÔÀÓ ½ÃÀÛ ½Ã°£ ±â·Ï
         }
         else if (menuChoice == 3) {
-            std::cout << "ê²Œìž„ì„ ì¢…ë£Œí•©ë‹ˆë‹¤." << std::endl;
+            std::cout << "°ÔÀÓÀ» Á¾·áÇÕ´Ï´Ù." << std::endl;
             break;
         }
         else {
-            std::cout << "ìž˜ëª»ëœ ì„ íƒìž…ë‹ˆë‹¤." << std::endl;
+            std::cout << "Àß¸øµÈ ¼±ÅÃÀÔ´Ï´Ù." << std::endl;
             continue;
         }
 
-        // ê²Œìž„ í™”ë©´ í‘œì‹œ
+        // °ÔÀÓ È­¸é Ç¥½Ã
         while (true) {
             ShowGameScreen(id, idData[id].first, idData[id].second);
 
-            char gameChoice; // ê²Œìž„ í™”ë©´ì—ì„œì˜ ì„ íƒì§€ ë³€ìˆ˜
+            char gameChoice; // °ÔÀÓ È­¸é¿¡¼­ÀÇ ¼±ÅÃÁö º¯¼ö
             std::cin >> gameChoice;
 
-            // UI ë©”ë‰´ ì²˜ë¦¬
+            // UI ¸Þ´º Ã³¸®
             switch (gameChoice) {
             case '1':
-                // ê°€ê²Œë¥¼ í‚¤ìš´ë‹¤
-                if (idData[id].first < 25) { // 25ë‹¨ê³„ ì´í•˜ì¸ ê²½ìš°ì—ë§Œ ì§„í–‰
-                    // ë‹¤ìŒ ë‹¨ê³„ë¡œ ë„˜ì–´ê°€ê¸°
-                    if (rand() % 100 < successRates[idData[id].first]) { // ì„±ê³µ ì—¬ë¶€ íŒì •
+                // °¡°Ô¸¦ Å°¿î´Ù
+                if (idData[id].first < 25) { // 25´Ü°è ÀÌÇÏÀÎ °æ¿ì¿¡¸¸ ÁøÇà
+                    // ´ÙÀ½ ´Ü°è·Î ³Ñ¾î°¡±â
+                    if (rand() % 100 < successRates[idData[id].first]) { // ¼º°ø ¿©ºÎ ÆÇÁ¤
                         ++idData[id].first;
-                        idData[id].second -= upgradeCosts[idData[id].first]; // ê°•í™” ë¹„ìš© ì°¨ê°
-                        std::cout << "\033[1;32mê±°ë´ìœ , ì œê°€ ìž˜ ë ê±°ë¼ ê·¸ëž¬ì¥¬.\033[0m" << idData[id].first - 1 << "\033[33më‹¨ê³„ì—ì„œ\033[0m " << idData[id].first << "\033[33më‹¨ê³„ë¡œ ì—…ê·¸ë ˆì´ë“œë˜ì—ˆìŠµë‹ˆë‹¤.\033[0m" << std::endl;
+                        idData[id].second -= upgradeCosts[idData[id].first]; // °­È­ ºñ¿ë Â÷°¨
+                        std::cout << "\033[1;32m°ÅºÁÀ¯, Á¦°¡ Àß µÉ°Å¶ó ±×·¨Áê.\033[0m" << idData[id].first - 1 << "\033[33m´Ü°è¿¡¼­\033[0m " << idData[id].first << "\033[33m´Ü°è·Î ¾÷±×·¹ÀÌµåµÇ¾ú½À´Ï´Ù.\033[0m" << std::endl;
                         SaveGame(idData);
-                        SaveGameToCSV(idData, id);
+                        SaveGameToCSV(idData, id, gameStartTime);
                     }
                     else {
-                        std::cout << "\033[1;31mì œ ë§ ì•ˆë“¤ìœ¼ë‹ˆ ì´ë ‡ê²Œ ëìž–ì•„ìœ .ê±°ê¸°ëŠ” ì¢€ ë”°ëœ»í•´ìœ ?\033[0m " << std::endl;
-                        // ì‹¤íŒ¨ ì‹œ ë‹¨ê³„ë¥¼ 1ë¡œ ì´ˆê¸°í™”
+                        std::cout << "\033[1;31mÁ¦ ¸» ¾ÈµéÀ¸´Ï ÀÌ·¸°Ô µÆÀÝ¾ÆÀ¯.°Å±â´Â Á» µû¶æÇØÀ¯?\033[0m " << std::endl;
+                        // ½ÇÆÐ ½Ã ´Ü°è¸¦ 1·Î ÃÊ±âÈ­
                         idData[id].first = 1;
                         SaveGame(idData);
-                        SaveGameToCSV(idData, id);
+                        SaveGameToCSV(idData, id, gameStartTime);
                     }
                 }
                 else {
-                    std::cout << "ìµœëŒ€ ì—…ê·¸ë ˆì´ë“œ ë‹¨ê³„ì— ë„ë‹¬í–ˆìŠµë‹ˆë‹¤." << std::endl;
+                    std::cout << "ÃÖ´ë ¾÷±×·¹ÀÌµå ´Ü°è¿¡ µµ´ÞÇß½À´Ï´Ù." << std::endl;
                     SaveGame(idData);
-                    SaveGameToCSV(idData, id);
+                    SaveGameToCSV(idData, id, gameStartTime);
                 }
                 break;
 
             case '2':
-                // ê°€ê²Œë¥¼ íŒë§¤í•œë‹¤
-                salePrice = salePrices[idData[id].first]; // í˜„ìž¬ ë‹¨ê³„ì— í•´ë‹¹í•˜ëŠ” íŒë§¤ ê¸ˆì•¡
-                idData[id].second += salePrice; // íŒë§¤ë¡œ ì–»ì€ ê¸ˆì•¡ ì¶”ê°€
-                idData[id].first = 1; // ë ˆë²¨ì„ 1ë¡œ ì´ˆê¸°í™”
-                std::cout << "ê°€ê²Œë¥¼ íŒë§¤í–ˆìŠµë‹ˆë‹¤. ì†Œì§€ê¸ˆì— " << salePrice << "ì›ì´ ì¶”ê°€ë˜ì—ˆìŠµë‹ˆë‹¤." << std::endl;
+                // °¡°Ô¸¦ ÆÇ¸ÅÇÑ´Ù
+                salePrice = salePrices[idData[id].first]; // ÇöÀç ´Ü°è¿¡ ÇØ´çÇÏ´Â ÆÇ¸Å ±Ý¾×
+                idData[id].second += salePrice; // ÆÇ¸Å·Î ¾òÀº ±Ý¾× Ãß°¡
+                idData[id].first = 1; // ·¹º§À» 1·Î ÃÊ±âÈ­
+                std::cout << "°¡°Ô¸¦ ÆÇ¸ÅÇß½À´Ï´Ù. ¼ÒÁö±Ý¿¡ " << salePrice << "¿øÀÌ Ãß°¡µÇ¾ú½À´Ï´Ù." << std::endl;
                 SaveGame(idData);
-                SaveGameToCSV(idData, id);
+                SaveGameToCSV(idData, id, gameStartTime);
                 break;
 
             case '3':
-                // ì €ìž¥í•˜ê¸°
+                // ÀúÀåÇÏ±â
                 SaveGame(idData);
-                SaveGameToCSV(idData, id);
+                SaveGameToCSV(idData, id, gameStartTime);
                 break;
 
             case '4':
-                // ì¢…ë£Œ
+                // Á¾·á
                 SaveGame(idData);
-                SaveGameToCSV(idData, id);
-                std::cout << "ê²Œìž„ì„ ì¢…ë£Œí•©ë‹ˆë‹¤." << std::endl;
+                SaveGameToCSV(idData, id, gameStartTime);
+                std::cout << "°ÔÀÓÀ» Á¾·áÇÕ´Ï´Ù." << std::endl;
                 return 0;
 
             default:
-                std::cout << "ìž˜ëª»ëœ ì„ íƒìž…ë‹ˆë‹¤." << std::endl;
+                std::cout << "Àß¸øµÈ ¼±ÅÃÀÔ´Ï´Ù." << std::endl;
             }
         }
     }
